@@ -8,14 +8,11 @@ import (
 )
 
 type Neuron struct {
-	Weight []float64
-	Output float64
-	Error  float64
-	Delta  float64
+	Weight []float64 `json:"Weight"`
 }
 
-func (n *Neuron) Derivative() (derivative float64) {
-	return n.Output * (1 - n.Output)
+func (n *Neuron) Derivative(output float64) (derivative float64) {
+	return output * (1 - output)
 }
 
 func (n *Neuron) Calc(input []float64) (output float64) {
@@ -39,6 +36,5 @@ func (n *Neuron) Calc(input []float64) (output float64) {
 	//Bias
 	net += n.Weight[len(n.Weight)-1]
 
-	n.Output = 1 / (1 + math.Exp(-net))
-	return n.Output
+	return 1 / (1 + math.Exp(-net))
 }
