@@ -1,33 +1,34 @@
 package neuron
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
-	"os"
 )
 
 type Neuron struct {
-	Weight []float64 `json:"Weight"`
+	Weight   []float64 `json:"Weight"`
+	Function string    `json:"Function"`
 }
 
 func (n *Neuron) Derivative(output float64) (derivative float64) {
-	return output * (1 - output)
+	if n.Function == "RELU" {
+		if output <= 0 {
+			return 0.01
+		} else {
+			return 1.0
+		}
+	} else {
+		return output * (1 - output)
+	}
 }
 
 func (n *Neuron) Calc(input []float64) (output float64) {
-	for _, v := range input {
-		if v > 1 || v < -1 {
-			fmt.Println("Error, input out of range:", v)
-			os.Exit(1)
-		}
-	}
-
+	
 	var net float64 = 0
 
 	//Generate weights, add an extra for bias
 	for len(n.Weight) <= len(input) {
-		n.Weight = append(n.Weight, ((rand.Float64() * 2) - 1))
+		n.Weight = append(n.Weight, (float64(rand.Intn(256))-127)/127)
 	}
 
 	for i := range input {
@@ -36,5 +37,13 @@ func (n *Neuron) Calc(input []float64) (output float64) {
 	//Bias
 	net += n.Weight[len(n.Weight)-1]
 
-	return 1 / (1 + math.Exp(-net))
+	if n.Function == "RELU" {
+		if net <= 0 {
+			return 0.01 * net
+		} else {
+			return net
+		}
+	} else {
+		return 1 / (1 + math.Exp(-net))
+	}
 }
